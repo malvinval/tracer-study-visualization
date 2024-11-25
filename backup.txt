@@ -1,4 +1,0 @@
-luar_indonesia = filtered_data[~filtered_data['DaerahTempatKerja']].str.contains('JAWA BARAT|DKI JAKARTA|BANTEN|JAWA TENGAH|JAWA TIMUR|DI YOGYAKARTA|SUMATERA SELATAN|SULAWESI UTARA|MALUKU|RIAU|LAMPUNG|SUMATERA BARAT|KALIMANTAN TENGAH|SULAWESI TENGAH|SULAWESI TENGGARA|KEPULAUAN BANGKA BELITUNG|KALIMANTAN TIMUR|NUSA TENGGARA TIMUR|KALIMANTAN UTARA|SUMATERA UTARA|BALI|SULAWESI SELATAN')
-    wilayah_terbanyak = luar_indonesia['DaerahTempatKerja'].value_counts().head(5).reset_index()
-    wilayah_terbanyak.columns = ['Wilayah', 'Jumlah']
-    st.table(wilayah_terbanyak)
