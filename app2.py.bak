@@ -1,0 +1,76 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+
+# Fungsi untuk memuat dataset
+@st.cache
+def load_data():
+    # Ganti 'tracer_study.csv' dengan lokasi dataset Anda
+    return pd.read_excel('tracer_final.xlsx')
+
+# Fungsi untuk menambahkan filter
+def apply_filters(data, tahun_lulus, prodi):
+    if tahun_lulus != "Semua":
+        data = data[data["TahunLulus"] == tahun_lulus]
+    if prodi != "Semua":
+        data = data[data["Prodi"] == prodi]
+    return data
+
+# Memuat dataset
+data = load_data()
+
+# Sidebar untuk filter
+st.sidebar.title("Filter Dashboard")
+tahun_lulus_filter = st.sidebar.selectbox(
+    "Pilih Tahun Lulus", 
+    options=["Semua"] + sorted(data["TahunLulus"].unique().tolist())
+)
+prodi_filter = st.sidebar.selectbox(
+    "Pilih Prodi", 
+    options=["Semua"] + sorted(data["Prodi"].unique().tolist())
+)
+
+# Terapkan filter
+filtered_data = apply_filters(data, tahun_lulus_filter, prodi_filter)
+
+# Container untuk dashboard
+st.title("Dashboard Tracer Study")
+
+# 1. Jumlah Pengisi Form
+st.header("Jumlah Pengisi Form")
+jumlah_pengisi = filtered_data.shape[0]
+st.metric(label="", value=f"{jumlah_pengisi}")
+
+# 2. Pendapatan Tertinggi
+st.header("Pendapatan Tertinggi")
+pendapatan_tertinggi = filtered_data["PendapatanPerbulan"].max()
+st.metric(
+    label="Pendapatan Tertinggi",
+    value=f"Rp {pendapatan_tertinggi:,.0f}" if not np.isnan(pendapatan_tertinggi) else "Data Tidak Tersedia"
+)
+
+# 3. Distribusi Alumni Berdasarkan Status Pekerjaan (Donut Chart)
+st.header("Distribusi Alumni Berdasarkan Status Pekerjaan")
+status_chart = px.pie(
+    filtered_data,
+    names="StatusPekerjaan",
+    hole=0.4,
+    title="Distribusi Status Pekerjaan"
+)
+st.plotly_chart(status_chart, use_container_width=True)
+
+# 4. Distribusi Alumni Berdasarkan Jenis Perusahaan (Bar Chart)
+st.header("Distribusi Alumni Berdasarkan Jenis Perusahaan")
+jenis_chart = px.bar(
+    filtered_data["JenisPerusahaan"].value_counts().reset_index(),
+    x='count',
+    y='JenisPerusahaan',
+    labels={"index": "Jenis Perusahaan", "JenisPerusahaan": "Jumlah"},
+    title="Distribusi Berdasarkan Jenis Perusahaan"
+)
+st.plotly_chart(jenis_chart, use_container_width=True)
+
+# Footer untuk menambah visualisasi lain
+st.write("### Tambahkan Visualisasi Baru di Bawah Ini")
+# Tambahkan visualisasi tambahan dengan fungsi baru di sini.
